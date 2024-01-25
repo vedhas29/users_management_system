@@ -17,14 +17,14 @@ class users_controller_model:
 
 
 # GET API
-    def GET_USERS(self):
-        self.cur.execute("SELECT * FROM USERS")
-        fetched_data = self.cur.fetchall()
+    async def GET_USERS(self):
+        await self.cur.execute("SELECT * FROM USERS")
+        fetched_data = await self.cur.fetchall()
         print("GET : ", fetched_data)
         print("in GET_USERS_fn()")
         if len(fetched_data)>0:
             return {"User details" : fetched_data} #returns as JSON
-        # return json.dumps(fetched_data) #returns as text.html
+            # return json.dumps(fetched_data) #returns as text.html
         else:
             return {"message" : "NO DATA FOUND"}
      

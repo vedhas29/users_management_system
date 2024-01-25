@@ -2,13 +2,21 @@
 from app import app
 from model.users_controller_model import users_controller_model
 from flask import request
+from wtforms import Form, StringField, validators,IntegerField
+import asyncio
+import aiomysql
+
+class UserForm(Form):
+    city = StringField('city', [validators.InputRequired(), validators.Length(min=1,max=50)])
+    fullName = StringField('fullName', [validators.InputRequired(),validators.Length(min=1, max=250)])
+    id = IntegerField('id', [validators.InputRequired()])
 
 users_controller_model_obj = users_controller_model()
 @app.route("/users/get")
-def users_controller_for_GET():
+async def users_controller_for_GET():
     print("in users_controller")
     print ("users_controller() working")
-    return users_controller_model_obj.GET_USERS()
+    return await users_controller_model_obj.GET_USERS()
 
 @app.route("/users/post", methods = ["POST"])
 def users_controller_for_POST():
@@ -16,9 +24,16 @@ def users_controller_for_POST():
     print("working")
     # get the data from postman
     print(request.form)
-    data_to_fn = request.form
-    return users_controller_model_obj.POST_USERS(data_to_fn)
-
+    # data_to_fn = request.form
+    # validating data that is received from postman
+    form  = UserForm(request.form)
+    print(form.data)
+    print(form.validate())
+    if request.method == 'POST' and form.validate():
+        data_to_fn = form.data
+        return users_controller_model_obj.POST_USERS(data_to_fn)
+    else:
+        return {"message" : "Invalid data format"}
 
 @app.route("/users/put", methods = ["PUT"])
 def users_controller_for_PUT():
